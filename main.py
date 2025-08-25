@@ -20,12 +20,13 @@ def main():
     sts_client = boto3_client("sts")
 
     logger.info("start of processing")
-    print("start of processing")
+
     resources = os.environ['RESOURCES_DIR'] # static resources
     node_identifier = os.environ['NODE_IDENTIFIER']
     env = os.getenv('ENVIRONMENT', 'local').lower()
 
     sync_resources(sts_client, env, node_identifier, resources)
+    logger.info("end of processing")
 
 def sync_resources(sts_client, env, node_identifier, resources_directory):
     if env == "local":
@@ -42,7 +43,7 @@ def sync_resources(sts_client, env, node_identifier, resources_directory):
     except subprocess.CalledProcessError as e:
         logger.info(f"command failed with return code {e.returncode}")
 
-    logger.info("end of processing")
+
 
 if __name__ == '__main__':
     main()    
