@@ -2,23 +2,34 @@
 
 import os
 import subprocess
+import logging
 
 from boto3 import client as boto3_client
-from logger import ResourcesManagerLogger
+
+logger = logging.getLogger('ResourcesManager')
 
 def main():
-    logger = ResourcesManagerLogger()
+    # Setup logging
+    logger.setLevel(logging.INFO)
+    handler = logging.StreamHandler()
+    handler.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
     sts_client = boto3_client("sts")
 
+    logger.info("start of processing")
     print("start of processing")
     resources = os.environ['RESOURCES_DIR'] # static resources
     node_identifier = os.environ['NODE_IDENTIFIER']
     env = os.getenv('ENVIRONMENT', 'local').lower()
 
-    sync_resources(sts_client, env, node_identifier, resources, logger)
+    sync_resources(sts_client, env, node_identifier, resources)
 
-def sync_resources(sts_client, env, node_identifier, resources_directory, logger):
+def sync_resources(sts_client, env, node_identifier, resources_directory):
     if env == "local":
+        logger.info("local environment detected, skipping s3 sync")
         return
 
     account_id = sts_client.get_caller_identity()["Account"]
@@ -30,6 +41,8 @@ def sync_resources(sts_client, env, node_identifier, resources_directory, logger
         logger.info(output)
     except subprocess.CalledProcessError as e:
         logger.info(f"command failed with return code {e.returncode}")
+
+    logger.info("end of processing")
 
 if __name__ == '__main__':
     main()    
