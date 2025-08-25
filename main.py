@@ -38,8 +38,15 @@ def sync_resources(sts_client, env, node_identifier, resources_directory):
     prefix = "{0}/{1}/resources".format(env, node_identifier)
 
     try:
-        output = subprocess.run(["aws", "s3", "sync", "s3://{0}/{1}/".format(bucket_name, prefix), resources_directory]) 
-        logger.info(output)
+        process = subprocess.Popen(
+            ["aws", "s3", "sync", "s3://{0}/{1}/".format(bucket_name, prefix), resources_directory],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True
+        )
+        for line in process.stdout:
+            print(line, end="")  # real-time streaming
+        process.wait()
     except subprocess.CalledProcessError as e:
         logger.info(f"command failed with return code {e.returncode}")
 
