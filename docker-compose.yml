@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  
+  resources-manager:
+    env_file:
+      - dev.env
+    image: pennsieve/resources-manager
+    volumes:
+      - ./data:/service/data
+    container_name: resources-manager
+    build:
+      context: .
+      dockerfile: ./Dockerfile

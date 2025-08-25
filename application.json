@@ -1,0 +1,23 @@
+{
+  "name": "resources-manager",
+  "description": "resources-manager",
+  "version": "1.0.0",
+  "inputs": [
+    {
+      "name": "Resources",
+      "description": "static resources",
+      "path": "/input",
+      "files": [
+        {
+          "id": "resources_file",
+          "description": "a static resource file",
+          "ext": "*",
+          "required": true
+        }
+      ]
+    }
+  ],
+  "outputs": [],
+  "params": [],
+  "depends_on": []
+}
