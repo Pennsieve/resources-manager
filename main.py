@@ -26,7 +26,7 @@ def sync_resources(sts_client, env, node_identifier, resources_directory, logger
     prefix = "{0}/{1}/resources".format(env, node_identifier)
 
     try:
-        output = subprocess.run(["aws", "s3", "sync", "s3://{0}/{1}/".format(bucket_name, prefix)], resources_directory) 
+        output = subprocess.run(["aws", "s3", "sync", "s3://{0}/{1}/".format(bucket_name, prefix), resources_directory]) 
         logger.info(output)
     except subprocess.CalledProcessError as e:
         logger.info(f"command failed with return code {e.returncode}")
