@@ -47,10 +47,8 @@ def sync_resources(sts_client, env, node_identifier, resources_directory):
         for line in process.stdout:
             print(line, end="")  # real-time streaming
         process.wait()
-    except process.CalledProcessError as e:
+    except subprocess.CalledProcessError as e:
         logger.info(f"command failed with return code {e.returncode}")
-
-
 
 if __name__ == '__main__':
     main()    
