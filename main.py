@@ -20,7 +20,6 @@ def main():
     sts_client = boto3_client("sts")
 
     logger.info("start of processing")
-
     resources = os.environ['RESOURCES_DIR'] # static resources
     node_identifier = os.environ['NODE_IDENTIFIER']
     env = os.getenv('ENVIRONMENT', 'local').lower()
@@ -36,17 +35,24 @@ def sync_resources(sts_client, env, node_identifier, resources_directory):
     account_id = sts_client.get_caller_identity()["Account"]
     bucket_name = "tfstate-{0}".format(account_id)
     prefix = "{0}/{1}/resources".format(env, node_identifier)
+    dest = os.environ['OUTPUT_DIR']
 
     try:
-        process = subprocess.Popen(
-            ["aws", "s3", "sync", "s3://{0}/{1}/".format(bucket_name, prefix), resources_directory],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True
-        )
-        for line in process.stdout:
-            print(line, end="")  # real-time streaming
-        process.wait()
+        logger.info("starting s3 sync")
+
+        with open(f'{dest}/aws_sync.log', "w") as log_file:
+            process = subprocess.Popen(
+                ["aws", "s3", "sync", "s3://{0}/{1}/".format(bucket_name, prefix), resources_directory],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True
+            )
+            for line in process.stdout:
+                print(line, end="")  # real-time streaming
+                log_file.write(line)
+            process.wait()
+
+        logger.info("sync completed")
     except subprocess.CalledProcessError as e:
         logger.info(f"command failed with return code {e.returncode}")
 
