@@ -22,9 +22,9 @@ def main():
     logger.info("start of processing")
     resources = os.environ['RESOURCES_DIR'] # static resources
     node_identifier = os.environ['NODE_IDENTIFIER']
-    env = os.getenv('ENVIRONMENT', 'local').lower()
+    env_identifier = os.environ.get('ENV_IDENTIFIER')
 
-    sync_resources(sts_client, env, node_identifier, resources)
+    sync_resources(sts_client, env_identifier, node_identifier, resources)
     logger.info("end of processing")
 
 def sync_resources(sts_client, env, node_identifier, resources_directory):
