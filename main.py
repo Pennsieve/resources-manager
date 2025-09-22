@@ -42,14 +42,19 @@ def sync_resources(sts_client, env, node_identifier, resources_directory):
 
         with open(f'{dest}/aws_sync.log', "w") as log_file:
             process = subprocess.Popen(
-                ["aws", "s3", "sync", "s3://{0}/{1}/".format(bucket_name, prefix), resources_directory],
+                ["stdbuf", "-oL", "aws", "s3", "sync", "s3://{0}/{1}/".format(bucket_name, prefix), resources_directory],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True
             )
-            for line in process.stdout:
-                print(line, end="")  # real-time streaming
+            # Read stdout line by line in real-time (blocking)
+            while True:
+                line = process.stdout.readline()
+                if not line:
+                    break
+                print(line, end='')
                 log_file.write(line)
+
             process.wait()
 
         list_files(resources_directory)
